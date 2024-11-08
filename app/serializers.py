@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from .models import Product, Cart, Order, Payment
 
 User = get_user_model()
@@ -25,7 +25,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    username = serializers.CharField()
     password = serializers.CharField()
 
     def validate(self, data):
@@ -49,7 +49,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'category', 'price', 'stock', 'description']
+        fields = [ 'name', 'category', 'price', 'stock', 'description']
 
 class CreateProductSerializer(serializers.ModelSerializer):
     class Meta:

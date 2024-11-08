@@ -1,14 +1,17 @@
 from django.urls import path
+
+from . import views
 from .views import (
     RegisterView, LoginView, ProfileView, UpdateProfileView,
     ProductListView, ProductDetailView, ProductSearchView, AddProductView,
     UpdateProductView, DeleteProductView, AddToCartView, CartView,
     RemoveFromCartView, CheckoutView, OrderDetailView, InitiatePaymentView,
     VerifyPaymentView, PaymentHistoryView, TrackOrderView, AssignDeliveryPartnerView,
-    UpdateDeliveryStatusView
+    UpdateDeliveryStatusView, CombinedAnalyticsView
 )
 
 urlpatterns = [
+    path('', views.home_page, name='home'),
     # A. User Management and Authentication
     path('users/register/', RegisterView.as_view(), name='register'),
     path('users/login/', LoginView.as_view(), name='login'),
@@ -39,4 +42,5 @@ urlpatterns = [
     path('orders/<int:orderId>/track/', TrackOrderView.as_view(), name='track_order'),
     path('orders/<int:orderId>/assign/', AssignDeliveryPartnerView.as_view(), name='assign_delivery_partner'),
     path('delivery/update-status/', UpdateDeliveryStatusView.as_view(), name='update_delivery_status'),
+    path('admin/dashboard/', CombinedAnalyticsView.as_view(), name='admin-dashboard'),
 ]

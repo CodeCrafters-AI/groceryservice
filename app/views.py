@@ -1,9 +1,13 @@
+from django.shortcuts import render
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from django.db.models import Sum, Count
+from datetime import timedelta
+from django.utils import timezone
 
 from .models import User, Product, Cart, Order, Payment
 from .serializers import (
@@ -21,6 +25,21 @@ from .serializers import (
     AssignDeliveryPartnerSerializer,
     DeliveryStatusUpdateSerializer
 )
+
+def home_page(request):
+    """
+    Home page view that displays products to users.
+    """
+    # Fetch all products to display on the homepage
+    products = Product.objects.all()
+
+    # Create context to pass to the template
+    context = {
+        'products': products
+    }
+
+    return render(request, 'index.html', context)
+
 
 # A. User Management and Authentication
 
@@ -42,10 +61,16 @@ class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data['email']
-            password = serializer.validated_data['password']
+            # email = serializer.validated_data.get('username')
+            # password = serializer.validated_data.get('password')
+            email = request.data['username']
+            password = request.data['password']
+            # Check if the email and password are correct
+            print(f"Email: {email}, Password: {password}")
 
             user = authenticate(request, username=email, password=password)
+            print(f"Authenticated user: {user}")  # Debugging line
+
             if user:
                 refresh = RefreshToken.for_user(user)
                 return Response({
@@ -58,7 +83,7 @@ class LoginView(APIView):
 
 
 class ProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -101,7 +126,7 @@ class ProductSearchView(generics.ListAPIView):
 
 
 class AddProductView(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    #permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
@@ -256,3 +281,71 @@ class UpdateDeliveryStatusView(APIView):
             order.save()
             return Response({'message': 'Delivery status updated'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# Combined Analytics View
+class CombinedAnalyticsView(APIView):
+    def get(self, request):
+        # Dashboard Overview Data
+        total_users = User.objects.count()
+        total_orders = Order.objects.count()
+        completed_orders = Order.objects.filter(status='Completed').count()
+        pending_orders = Order.objects.filter(status='Pending').count()
+        total_revenue = Payment.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+        total_products = Product.objects.count()
+        total_sold = Order.objects.filter(status='Completed').aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+        # Recent Order Analytics (Last Month)
+        one_month_ago = timezone.now() - timedelta(days=30)
+        recent_orders = Order.objects.filter(created_at__gte=one_month_ago)
+        total_recent_orders = recent_orders.count()
+        completed_recent_orders = recent_orders.filter(status='Completed').count()
+        pending_recent_orders = recent_orders.filter(status='Pending').count()
+        recent_revenue = Payment.objects.filter(created_at__gte=one_month_ago).aggregate(Sum('amount'))[
+                             'amount__sum'] or 0
+
+        # Product Analytics (Total Sold and Revenue)
+        product_stats = []
+        products = Product.objects.all()
+        for product in products:
+            total_sold_for_product = \
+            Order.objects.filter(product=product, status='Completed').aggregate(Sum('quantity'))['quantity__sum'] or 0
+            revenue_for_product = Payment.objects.filter(order__product=product).aggregate(Sum('amount'))[
+                                      'amount__sum'] or 0
+            product_stats.append({
+                'product_name': product.name,
+                'total_sold': total_sold_for_product,
+                'revenue': revenue_for_product
+            })
+
+        # Revenue Over Time (Last 30 Days)
+        recent_dates = [(timezone.now() - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(30)]
+        recent_revenue_data = [
+            Payment.objects.filter(created_at__date=date).aggregate(Sum('amount'))['amount__sum'] or 0 for date in
+            recent_dates]
+
+        # Payment Methods Distribution
+        payment_methods = Payment.objects.values('payment_method').annotate(method_count=Count('id'))
+        payment_methods_labels = [p['payment_method'] for p in payment_methods]
+        payment_methods_counts = [p['method_count'] for p in payment_methods]
+
+        # Render the template with analytics data
+        analytics_data = {
+            'total_users': total_users,
+            'total_orders': total_orders,
+            'completed_orders': completed_orders,
+            'pending_orders': pending_orders,
+            'total_revenue': total_revenue,
+            'total_products': total_products,
+            'total_sold': total_sold,
+            'total_recent_orders': total_recent_orders,
+            'completed_recent_orders': completed_recent_orders,
+            'pending_recent_orders': pending_recent_orders,
+            'recent_revenue': recent_revenue,
+            'product_names': [p['product_name'] for p in product_stats],
+            'product_totals_sold': [p['total_sold'] for p in product_stats],
+            'recent_dates': recent_dates,
+            'recent_revenue_data': recent_revenue_data,
+            'payment_methods_labels': payment_methods_labels,
+            'payment_methods_counts': payment_methods_counts
+        }
+
+        return render(request, 'dashboard.html', {'analytics_data': analytics_data})

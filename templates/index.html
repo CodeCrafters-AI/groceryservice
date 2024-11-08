@@ -10,13 +10,36 @@
     
     <!-- Links to various functionalities -->
     <ul>
+        <!-- A. User Management and Authentication -->
         <li><a href="/users/register/">Register</a></li>
         <li><a href="/users/login/">Login</a></li>
-        <li><a href="/profile/">User Profile</a></li>
+        <li><a href="/users/profile/">User Profile</a></li>
+        <li><a href="/users/profile/update/">Update Profile</a></li>
+
+        <!-- B. Product Management -->
         <li><a href="/products/">View Products</a></li>
-        <li><a href="/products/create/">Create Product (Admin Only)</a></li>
-        <li><a href="/orders/create/">Place Order</a></li>
-        <li><a href="/payments/create/">Make Payment</a></li>
+        <li><a href="/products/search/">Search Products</a></li>
+        <li><a href="/admin/products/">Create Product (Admin Only)</a></li>
+        <li><a href="/admin/products/<int:pk>/">Update Product (Admin Only)</a></li>
+        <li><a href="/admin/products/<int:pk>/delete/">Delete Product (Admin Only)</a></li>
+
+        <!-- C. Cart and Checkout -->
+        <li><a href="/cart/">View Cart</a></li>
+        <li><a href="/cart/add/">Add to Cart</a></li>
+        <li><a href="/cart/<int:productId>/">Remove from Cart</a></li>
+        <li><a href="/orders/checkout/">Checkout</a></li>
+        <li><a href="/orders/<int:orderId>/">Order Details</a></li>
+
+        <!-- D. Payment Integration -->
+        <li><a href="/payments/initiate/">Initiate Payment</a></li>
+        <li><a href="/payments/verify/">Verify Payment</a></li>
+        <li><a href="/payments/history/">Payment History</a></li>
+
+        <!-- E. Delivery Management -->
+        <li><a href="/orders/<int:orderId>/track/">Track Order</a></li>
+        <li><a href="/orders/<int:orderId>/assign/">Assign Delivery Partner (Admin Only)</a></li>
+        <li><a href="/delivery/update-status/">Update Delivery Status</a></li>
+        <li><a href="/admin/dashboard/">Admin Dashboard</a></li>
     </ul>
 </body>
 </html>
