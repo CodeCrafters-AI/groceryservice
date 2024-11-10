@@ -1,45 +1,500 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grocery Delivery Service</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive E-Commerce Header with Modals</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .location-info {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-left: 15px;
+    }
+    .search-bar {
+      max-width: 400px;
+      width: 100%;
+      margin-left: 15px;
+    }
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    /* Category card 3D effect */
+    .category-card {
+      transition: transform 0.2s ease, background-color 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+    .category-card:hover {
+      transform: scale(1.05);
+      background-color: #f8f9fa;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Product card with Add to Cart button */
+    .card {
+      position: relative;
+      overflow: hidden;
+    }
+    .add-to-cart-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: none;
+      transition: opacity 0.2s;
+    }
+    .card:hover .add-to-cart-btn {
+      display: inline-block;
+      opacity: 1;
+    }
+
+    /* Hover effect on product card */
+    .card:hover {
+      border-color: #0d6efd;
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+      transition: 0.3s;
+    }
+
+  </style>
 </head>
 <body>
-    <h1>Welcome to Grocery Delivery Service</h1>
-    
-    <!-- Links to various functionalities -->
-    <ul>
-        <!-- A. User Management and Authentication -->
-        <li><a href="/users/register/">Register</a></li>
-        <li><a href="/users/login/">Login</a></li>
-        <li><a href="/users/profile/">User Profile</a></li>
-        <li><a href="/users/profile/update/">Update Profile</a></li>
 
-        <!-- B. Product Management -->
-        <li><a href="/products/">View Products</a></li>
-        <li><a href="/products/search/">Search Products</a></li>
-        <li><a href="/admin/products/">Create Product (Admin Only)</a></li>
-        <li><a href="/admin/products/<int:pk>/">Update Product (Admin Only)</a></li>
-        <li><a href="/admin/products/<int:pk>/delete/">Delete Product (Admin Only)</a></li>
+<!-- Header Section -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container-fluid">
+    <!-- Left Section: Website Title -->
+    <a class="navbar-brand" href="#">ZipIt</a>
 
-        <!-- C. Cart and Checkout -->
-        <li><a href="/cart/">View Cart</a></li>
-        <li><a href="/cart/add/">Add to Cart</a></li>
-        <li><a href="/cart/<int:productId>/">Remove from Cart</a></li>
-        <li><a href="/orders/checkout/">Checkout</a></li>
-        <li><a href="/orders/<int:orderId>/">Order Details</a></li>
+    <!-- Center Section: Location Info and Search Bar -->
+    <div class="d-flex align-items-center flex-grow-1">
+      <div class="location-info">
+        📍 Location: New York, USA
+      </div>
+      <form class="d-flex search-bar">
+        <input class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+      </form>
+    </div>
 
-        <!-- D. Payment Integration -->
-        <li><a href="/payments/initiate/">Initiate Payment</a></li>
-        <li><a href="/payments/verify/">Verify Payment</a></li>
-        <li><a href="/payments/history/">Payment History</a></li>
+    <!-- Right Section: Cart, Login, Register -->
+    <div class="header-buttons">
+      <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cartModal"><i class="bi bi-cart"></i></button>
+      <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+      <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+    </div>
+  </div>
+</nav>
 
-        <!-- E. Delivery Management -->
-        <li><a href="/orders/<int:orderId>/track/">Track Order</a></li>
-        <li><a href="/orders/<int:orderId>/assign/">Assign Delivery Partner (Admin Only)</a></li>
-        <li><a href="/delivery/update-status/">Update Delivery Status</a></li>
-        <li><a href="/admin/dashboard/">Admin Dashboard</a></li>
-    </ul>
+<!-- Navigation Bar Below Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="tracking.html">Tracking</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Cart Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel">Shopping Cart</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Your cart is currently empty.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Checkout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="loginEmail" required>
+          </div>
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="loginPassword" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Register Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="registerModalLabel">Register</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="registerEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="registerPassword" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerConfirmPassword" class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" id="registerConfirmPassword" required>
+            </div>
+            <!-- Role Selection -->
+            <div class="mb-3">
+              <label for="userRole" class="form-label">I am a</label>
+              <select class="form-select" id="userRole" required>
+                <option value="" disabled selected>Select role</option>
+                <option value="customer">Customer</option>
+                <option value="deliveryPartner">Delivery Partner</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-success">Register</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- Category Section -->
+<div class="container my-4">
+    <div class="row g-3">
+      <div class="col-md-3" onclick="scrollToCategory('fruits-vegetables')">
+        <div class="card category-card">
+          <div class="card-body text-center">
+            <h5>Fruits & Vegetables</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" onclick="scrollToCategory('dairy-bread-eggs')">
+        <div class="card category-card">
+          <div class="card-body text-center">
+            <h5>Dairy & Bread</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" onclick="scrollToCategory('atta-rice-oil-dals')">
+        <div class="card category-card">
+          <div class="card-body text-center">
+            <h5>Atta, Rice, Oil & Dals</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" onclick="scrollToCategory('meat-fish-eggs')">
+        <div class="card category-card">
+          <div class="card-body text-center">
+            <h5>Meat, Fish & Eggs</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Sections -->
+  <div class="container my-4">
+    <!-- Fruits & Vegetables -->
+    <div id="fruits-vegetables" class="category-section">
+      <h2>Fruits & Vegetables</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Bananas</h5>
+              <p>$1.99 / kg</p>
+
+            <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Apples</h5>
+              <p>$3.49 / kg</p>
+
+            <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+              <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Bananas</h5>
+                <p>$1.99 / kg</p>
+
+            <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Passion Fruit</h5>
+                <p>$1.99 / kg</p>
+
+            <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+
+      </div>
+    </div>
+
+    <!-- Dairy, Bread & Eggs -->
+    <div id="dairy-bread-eggs" class="category-section">
+      <h2>Dairy & Bread</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Milk</h5>
+              <p>$0.99 / liter</p>
+
+            <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Bread</h5>
+              <p>$1.49</p>
+
+            <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+              <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Chesse</h5>
+                <p>$1.49</p>
+            <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Yogurt</h5>
+                <p>$1.49</p>
+
+            <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- Atta, Rice, Oil & Dals -->
+    <div id="atta-rice-oil-dals" class="category-section">
+      <h2>Atta, Rice, Oil & Dals</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Wheat Flour</h5>
+              <p>$2.99 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Rice</h5>
+              <p>$1.99 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+              <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Olive Oil</h5>
+                <p>$1.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Rajma</h5>
+                <p>$1.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- Meat, Fish & Eggs -->
+    <div id="meat-fish-eggs" class="category-section">
+      <h2>Meat, Fish & Eggs</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Chicken</h5>
+              <p>$4.99 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Fish</h5>
+              <p>$6.99 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+              <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Eggs</h5>
+                <p>$6.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Prawns</h5>
+                <p>$6.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer Section -->
+<footer class="bg-dark text-light pt-4">
+    <div class="container">
+      <div class="row">
+        <!-- About Us Section -->
+        <div class="col-md-3">
+          <h5>About Us</h5>
+          <p>We are a leading e-commerce platform providing a wide range of products to our customers. Quality and customer satisfaction are our top priorities.</p>
+        </div>
+
+        <!-- Customer Service Section -->
+        <div class="col-md-3">
+          <h5>Customer Service</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-light text-decoration-none">Help Center</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Returns</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Shipping</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Track Order</a></li>
+          </ul>
+        </div>
+
+        <!-- Quick Links Section -->
+        <div class="col-md-3">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-light text-decoration-none">Home</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Categories</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Offers</a></li>
+            <li><a href="#" class="text-light text-decoration-none">New Arrivals</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Us Section -->
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <p><i class="bi bi-geo-alt-fill"></i> 123 Main Street, Vellore, India</p>
+          <p><i class="bi bi-envelope-fill"></i> support@example.com</p>
+          <p><i class="bi bi-telephone-fill"></i> +91 12345 67890</p>
+        </div>
+      </div>
+
+      <!-- Social Media Links and Copyright -->
+      <div class="row mt-4">
+        <div class="col-md-12 text-center">
+          <a href="#" class="text-light me-3"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="text-light me-3"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="text-light me-3"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="text-light"><i class="bi bi-linkedin"></i></a>
+          <p class="mt-3">&copy; 2024 Your E-Commerce Site. All Rights Reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Icons CSS (Optional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+
+
+
+<!-- Bootstrap Icons (For Cart Icon) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function scrollToCategory(id) {
+      const section = document.getElementById(id);
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
 </body>
 </html>

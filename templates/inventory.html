@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #f5f5f5;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .product-table {
+            margin-top: 30px;
+            background-color: #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table th, .table td {
+            text-align: center;
+        }
+        .table th {
+            background-color: #444;
+        }
+        .table td {
+            background-color: #555;
+        }
+        .table-button {
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .table-button:hover {
+            background-color: #218838;
+        }
+        .modal-header, .modal-footer {
+            background-color: #333;
+        }
+        .modal-title {
+            color: #ffc107;
+        }
+        .btn-primary {
+            background-color: #ffc107;
+            border: none;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark ">
+            <div class="container-fluid">
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                  <li class="nav-item">
+                    <a class="nav-link" href="admin.html">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="orders.html">Orders</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="inventory.html">Inventory</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+
+        <!-- Logout Button -->
+        <button class="logout-btn" onclick="logout()">Logout</button>
+
+        <!-- Add New Product Button -->
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">Add New Product</button>
+
+        <!-- Product Table -->
+        <div class="product-table">
+            <table class="table table-bordered table-dark">
+                <thead>
+                    <tr>
+                        <th>Product Image</th>
+                        <th>Product Name</th>
+                        <th>Product ID</th>
+                        <th>Stock Quantity</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <!-- Products will be dynamically inserted here -->
+                    <!-- Example product row -->
+                    <tr>
+                        <td><img src="example.jpg" alt="Product Image" class="product-image"></td>
+                        <td>Example Product</td>
+                        <td>P12345</td>
+                        <td>100</td>
+                        <td>$50</td>
+                        <td>
+                            <button class="table-button" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="editProduct('P12345')">Edit</button>
+                            <button class="table-button" onclick="deleteProduct('P12345')">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addProductForm">
+                            <div class="mb-3">
+                                <label for="productImage" class="form-label">Product Image</label>
+                                <input type="file" class="form-control" id="productImage" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productName" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" id="productName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productId" class="form-label">Product ID</label>
+                                <input type="text" class="form-control" id="productId" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productStock" class="form-label">Stock Quantity</label>
+                                <input type="number" class="form-control" id="productStock" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productPrice" class="form-label">Price</label>
+                                <input type="number" class="form-control" id="productPrice" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Product Modal -->
+        <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editProductForm">
+                            <div class="mb-3">
+                                <label for="editProductImage" class="form-label">Product Image</label>
+                                <input type="file" class="form-control" id="editProductImage">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductName" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" id="editProductName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductId" class="form-label">Product ID</label>
+                                <input type="text" class="form-control" id="editProductId" readonly required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductStock" class="form-label">Stock Quantity</label>
+                                <input type="number" class="form-control" id="editProductStock" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductPrice" class="form-label">Price</label>
+                                <input type="number" class="form-control" id="editProductPrice" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            // Add your logout functionality here
+            alert("Logging out...");
+        }
+
+        function editProduct(productId) {
+            // Populate the edit modal with the selected product details
+            document.getElementById('editProductId').value = productId;
+            // Other code to fetch and populate the product data based on productId
+        }
+
+        function deleteProduct(productId) {
+            // Code to delete the product from the inventory
+            alert('Deleting product with ID: ' + productId);
+        }
+
+        // Handle adding a new product
+        document.getElementById('addProductForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const productImage = document.getElementById('productImage').files[0];
+            const productName = document.getElementById('productName').value;
+            const productId = document.getElementById('productId').value;
+            const productStock = document.getElementById('productStock').value;
+            const productPrice = document.getElementById('productPrice').value;
+
+            // Code to save the new product to your database or state
+            alert('Product added successfully');
+
+            // Add the new product to the table
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><img src="${URL.createObjectURL(productImage)}" class="product-image"></td>
+                <td>${productName}</td>
+                <td>${productId}</td>
+                <td>${productStock}</td>
+                <td>${productPrice}</td>
+                <td>
+                    <button class="table-button" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="editProduct('${productId}')">Edit</button>
+                    <button class="table-button" onclick="deleteProduct('${productId}')">Delete</button>
+                </td>
+            `;
+            document.getElementById('productTableBody').appendChild(newRow);
+
+            // Close the modal
+            $('#addProductModal').modal('hide');
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

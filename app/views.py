@@ -348,4 +348,4 @@ class CombinedAnalyticsView(APIView):
             'payment_methods_counts': payment_methods_counts
         }
 
-        return render(request, 'dashboard.html', {'analytics_data': analytics_data})
+        return render(request, 'tracking.html', {'analytics_data': analytics_data})
